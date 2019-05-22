@@ -1,7 +1,9 @@
 package ru.ifmo.rain.ustinov.guu
 
+import ru.ifmo.rain.ustinov.guu.commands.*
 
-class GuuInterpreter(private val program: Program, private var debug: Boolean) {
+
+class GuuInterpreter(private val program: GuuProgram, private var debug: Boolean) {
 
     private companion object {
         private const val MAX_STACK_SIZE = 2048
@@ -80,10 +82,10 @@ class GuuInterpreter(private val program: Program, private var debug: Boolean) {
         return stepInto
     }
 
-    private fun runSub(command: Command, into: Boolean) {
+    private fun runSub(command: SubCommand, into: Boolean) {
         trace.add(command.name to command)
         if (trace.size >= MAX_STACK_SIZE) {
-            throw GuuInterpretException("Stack overflow", trace)
+            throw GuuInterpreterException("Stack overflow", trace)
         }
         var stepInto = false
 
@@ -95,10 +97,10 @@ class GuuInterpreter(private val program: Program, private var debug: Boolean) {
                 println(trace[trace.size - 1].second)
                 stepInto = readCommand()
             }
-            when (cmd.type) {
-                CommandType.CALL -> runSub(program.subs[cmd.name]!!, stepInto)
-                CommandType.SET -> vars[cmd.name] = cmd.value
-                CommandType.PRINT -> println(vars[cmd.name])
+            when (cmd) {
+                is CallCommand -> runSub(program.subs[cmd.name]!!, stepInto)
+                is SetCommand -> vars[cmd.name] = cmd.value
+                is PrintCommand -> println(vars[cmd.name])
                 else -> return // ??
             }
         }
@@ -110,7 +112,7 @@ class GuuInterpreter(private val program: Program, private var debug: Boolean) {
     }
 }
 
-class GuuInterpretException(s: String, private val trace: ArrayList<Pair<String, Command>>) : Throwable(s) {
+class GuuInterpreterException(s: String, private val trace: ArrayList<Pair<String, Command>>) : Throwable(s) {
     fun printTrace() {
         for (i in 0..Integer.min(29, trace.size)) {
             System.err.println(
