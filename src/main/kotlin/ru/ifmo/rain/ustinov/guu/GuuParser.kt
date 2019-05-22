@@ -94,9 +94,9 @@ class GuuParserException(message: String?, cause: Throwable?) : Throwable(messag
 
 fun printUsage() {
     System.err.println(
-        """Usage: GuuParser.kt <file_path> [-debug]
-        |file_path - path to file with guu program
-        |-debug - Start step-by-step debugging
+        """Usage:  <file_path> [-debug]
+        |   file_path - path to file with guu program
+        |   -debug - Start step-by-step debugging
     """.trimMargin()
     )
 }
